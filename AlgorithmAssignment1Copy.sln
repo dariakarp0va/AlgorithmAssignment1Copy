@@ -1,0 +1,16 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlgorithmAssignment1Copy", "AlgorithmAssignment1Copy\AlgorithmAssignment1Copy.csproj", "{B6FAA0A6-2DE8-4F36-BA24-38DB63754385}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B6FAA0A6-2DE8-4F36-BA24-38DB63754385}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6FAA0A6-2DE8-4F36-BA24-38DB63754385}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6FAA0A6-2DE8-4F36-BA24-38DB63754385}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6FAA0A6-2DE8-4F36-BA24-38DB63754385}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
