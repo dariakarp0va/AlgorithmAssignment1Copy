@@ -1,4 +1,6 @@
-﻿namespace AlgorithmAssignment1Copy;
+﻿using System;
+
+namespace AlgorithmAssignment1Copy;
 
 public class Stack
 {

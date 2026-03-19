@@ -1,21 +1,23 @@
-﻿namespace AlgorithmAssignment1Copy;
+﻿using System;
 
-public class ListOfString
+namespace AlgorithmAssignment1Copy;
+
+public class ListOfTuples
 {
-    private string[] _array = new string [20];
+    private (string, int)[] _array = new (string, int) [20];
 
     private int _pointer = 0;
 
     private string result;
 
-    public void Add(string element)
+    public void Add((string, int) element)
     {
         _array[_pointer] = element;
         _pointer += 1;
         
         if (_pointer == _array.Length)
         {
-            var extendedArray = new string[_array.Length * 2];
+            var extendedArray = new (string, int)[_array.Length * 2];
             for (var i = 0; i < _array.Length; i++)
             {
                 extendedArray[i] = _array[i];
@@ -26,11 +28,11 @@ public class ListOfString
 
     }
 
-    public string GetAt(int index)
+    public (string, int) GetAt(int index)
     {
         return _array[index];
     }
-    public void Remove(string element)
+    public void Remove((string, int) element)
     {
         for (var i = 0; i < _pointer; i++)
         {
@@ -47,7 +49,7 @@ public class ListOfString
         }
     }
     
-    public int IndexOf(string element)
+    public int IndexOf((string, int) element)
     {
         for (var i = 0; i < _array.Length; i++)
         {
@@ -60,7 +62,7 @@ public class ListOfString
         return -1;
     }
     
-    public bool Contains(string element)
+    public bool Contains((string, int) element)
     {
         return IndexOf(element) != -1;
     }
@@ -79,6 +81,7 @@ public class ListOfString
             result += _array[i];
             i++;
         }
+        
         
         return result;
     }

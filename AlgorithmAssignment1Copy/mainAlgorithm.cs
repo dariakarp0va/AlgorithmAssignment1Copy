@@ -6,67 +6,49 @@ public class MainAlgorithm
 {
     private ListOfChars _array = new();
     private ListOfString _tokens = new();
+    private ListOfString _letters = new();
     private String _splitTogether = "";
     private ListOfString _result = new();
-    private ListOfString _operators1level = new();
-    private ListOfString _operators2level = new();
-    private ListOfString _operators3level = new();
-    private Stack _stackForPostinfixation = new();
-    private Stack _stackForInitialisation = new();
-
-    public void CreatingListOfOperators()
-    {
-        foreach (var operators in "+-")
-        {
-            _operators1level.Add(operators.ToString());
-        }
-        foreach (var operators in "*/")
-        {
-            _operators2level.Add(operators.ToString());
-        }
-        foreach (var operators in "^")
-        {
-            _operators3level.Add(operators.ToString());
-        }
-        foreach (var operators in "v")
-        {
-            _operators3level.Add("sin");
-            _operators3level.Add("cos");
-        }
-    }
+    private (string, int) _lvl1 = new ValueTuple<string, int>( "+-", 1);
+    private (string, int) _lvl2 = new ValueTuple<string, int>( "*/", 2);
+    private (string, int) _lvl3 = new ValueTuple<string, int>( "^sincosmaxmin", 3);
+    private (string, int) _lvl0 = new ValueTuple<string, int>( "+-*/^sincosmaxmin(),",0);
+    private readonly Stack _stackForPostinfixation = new();
+    private readonly Stack _stackForInitialisation = new();
+    
     public void Tokenisation(string num)
     {
         foreach (var symbol in num)
         {
             
-            if (char.IsDigit(symbol))
+            if (char.IsDigit(symbol) || symbol.ToString() == "." )
             {
                 _array.Add(symbol);
             }
-            else if (_operators1level.Contains(symbol.ToString()) || _operators2level.Contains(symbol.ToString()) || _operators3level.Contains(symbol.ToString()))
+            else if (char.IsLetter(symbol))
+            {
+                _letters.Add(symbol.ToString());
+                CheckIfOperator(_letters);
+            }
+            else if (_lvl0.Item1.Contains(symbol.ToString()))
             {
                 _splitTogether = _array.GetStringTogether();
                 Console.WriteLine($"Split {_splitTogether}");
-                _tokens.Add(_splitTogether);
+                if (_splitTogether != "") 
+                {
+                    _tokens.Add(_splitTogether);
+                }
                 _tokens.Add(symbol.ToString());
-            }
-            else if (symbol.ToString() == "n")
-            {
-                _tokens.Add("sin");
-            }
-            else if (symbol.ToString() == "c")
-            {
-                _tokens.Add("cos");
-            }
-            else if (symbol.ToString() == "(")
-            {
-                _tokens.Add(symbol.ToString());
+                
             }
 
         }
         _splitTogether = _array.GetStringTogether();
         Console.WriteLine($"Split {_splitTogether}");
-        _tokens.Add(_splitTogether);
+        if (_splitTogether != "") 
+        {
+            _tokens.Add(_splitTogether);
+        }
     }
 
     public void Postinfixation()
@@ -74,32 +56,28 @@ public class MainAlgorithm
         int i = 0;
         while (i < _tokens.Count())
         {
-            if (int.TryParse(_tokens.GetAt(i), out var token))
+            if (double.TryParse(_tokens.GetAt(i), out var token))
             {
                 _result.Add(_tokens.GetAt(i));
             }
-            else if (_operators3level.Contains(_tokens.GetAt(i)) || _tokens.GetAt(i) == "(")
+            else if (_lvl3.Item1.Contains(_tokens.GetAt(i)) || _tokens.GetAt(i) == "(")
             {
                 _stackForPostinfixation.Push(_tokens.GetAt(i));
             }
-            else if (_operators2level.Contains(_tokens.GetAt(i)))
+            else if (_lvl2.Item1.Contains(_tokens.GetAt(i)))
             {
-                while (_stackForPostinfixation.Peek() == "^")
+                while (_stackForPostinfixation.Peek() != null && _stackForPostinfixation.Peek() != "(" && (_lvl2.Item1.Contains(_stackForPostinfixation.Peek()) || _lvl3.Item1.Contains(_stackForPostinfixation.Peek()) && _stackForPostinfixation.Count() > 0))
                 {
-                    Console.WriteLine("opp");
                     _result.Add(_stackForPostinfixation.Pull());
                 }
                 _stackForPostinfixation.Push(_tokens.GetAt(i));
-                Console.WriteLine($"TOKEN {_tokens.GetAt(i)}");
-                Console.WriteLine($"Peek {_stackForPostinfixation.Peek()}");
             }
-            else if (_operators1level.Contains(_tokens.GetAt(i)))
+            else if (_lvl1.Item1.Contains(_tokens.GetAt(i)))
             {
-                if (_operators2level.Contains(_stackForPostinfixation.Peek()) || _operators3level.Contains(_stackForPostinfixation.Peek()))
+                if (_stackForPostinfixation.Peek() != null && (_lvl2.Item1.Contains(_stackForPostinfixation.Peek()) || _lvl3.Item1.Contains(_stackForPostinfixation.Peek())))
                 {
-                    while (0 < _stackForPostinfixation.Count())
+                    while (0 < _stackForPostinfixation.Count() && _stackForPostinfixation.Peek() != "(")
                     {
-                        Console.WriteLine("//");
                         _result.Add(_stackForPostinfixation.Pull());
                     }
                 }
@@ -119,15 +97,7 @@ public class MainAlgorithm
         }
         while (0 < _stackForPostinfixation.Count())
         {
-            Console.WriteLine("//");
             _result.Add(_stackForPostinfixation.Pull());
-        }
-
-        int b = 0;
-        while (b <= _result.Count())
-        {
-            Console.WriteLine(_result.GetAt(b));
-            b++;
         }
     }
 
@@ -137,56 +107,98 @@ public class MainAlgorithm
         int i = 0;
         while (i < _result.Count())
         {
-            Console.WriteLine(_result.GetAt(i));
-            if (int.TryParse(_result.GetAt(i), out var token))
+            if (double.TryParse(_result.GetAt(i), out var token))
             {
                 
                 _stackForInitialisation.Push(_result.GetAt(i));
             }
-            else if (_operators1level.Contains(_result.GetAt(i)) || _operators2level.Contains(_result.GetAt(i)) || _operators3level.Contains(_result.GetAt(i)))
+            else if (_lvl0.Item1.Contains(_result.GetAt(i)))
             {
-                int a = int.Parse(_stackForInitialisation.Pull());
-                var b = int.TryParse(_stackForInitialisation.Pull(), out int secondnum );
                 if (_result.GetAt(i) == "+")
                 {
+                    double a = double.Parse(_stackForInitialisation.Pull());
+                    var b = double.TryParse(_stackForInitialisation.Pull(), out double secondnum );
                     result = a + secondnum;
+                    Console.WriteLine($"{a} + {secondnum} = {result}");
                 }
                 else if (_result.GetAt(i) == "-")
                 {
+                    double a = double.Parse(_stackForInitialisation.Pull());
+                    var b = double.TryParse(_stackForInitialisation.Pull(), out double secondnum );
                     result = secondnum - a;
+                    Console.WriteLine($"{secondnum} - {a} = {result}");
                 }
                 else if (_result.GetAt(i) == "*")
                 {
+                    double a = double.Parse(_stackForInitialisation.Pull());
+                    var b = double.TryParse(_stackForInitialisation.Pull(), out double secondnum );
                     result = a * secondnum;
+                    Console.WriteLine($"{a} * {secondnum} = {result}");
                 }
                 else if (_result.GetAt(i) == "/")
                 {
+                    double a = double.Parse(_stackForInitialisation.Pull());
+                    var b = double.TryParse(_stackForInitialisation.Pull(), out double secondnum );
                     if (a == 0)
                     {
                         throw new Exception("Can't divide on 0");
                     }
                     result = secondnum / a;
+                    Console.WriteLine($"{secondnum} / {a} = {result}");
                 }
                 else if (_result.GetAt(i) == "^")
                 {
+                    double a = double.Parse(_stackForInitialisation.Pull());
+                    var b = double.TryParse(_stackForInitialisation.Pull(), out double secondnum );
                     result = 1;
                     for (int y = 0; y < a; y++)
                     {
                         result *= secondnum;
                     }
+                    Console.WriteLine($"{secondnum} ^ {a} = {result}");
                 }
                 else if (_result.GetAt(i) == "sin")
                 {
+                    double a = double.Parse(_stackForInitialisation.Pull());
                     result = Math.Sin(a);
+                    Console.WriteLine($"sin {a}  = {result}");
                 }
                 else if (_result.GetAt(i) == "cos")
                 {
+                    double a = double.Parse(_stackForInitialisation.Pull());
                     result = Math.Cos(a);
+                    Console.WriteLine($"cos {a} = {result}");
+                }
+                else if (_result.GetAt(i) == "min")
+                {
+                    double a = double.Parse(_stackForInitialisation.Pull());
+                    var b = double.TryParse(_stackForInitialisation.Pull(), out double secondnum );
+                    result = Math.Min(secondnum, a);
+                    Console.WriteLine($"Min {secondnum}, {a} = {result}");
+                }
+                else if (_result.GetAt(i) == "max")
+                {
+                    double a = double.Parse(_stackForInitialisation.Pull());
+                    var b = double.TryParse(_stackForInitialisation.Pull(), out double secondnum );
+                    result = Math.Max(secondnum, a);
+                    Console.WriteLine($"Max {secondnum}, {a} = {result}");
                 }
                 _stackForInitialisation.Push(result.ToString());
             }
             i++;
         }
         Console.WriteLine(double.Parse(_stackForInitialisation.Pull()));
+    }
+
+    public void CheckIfOperator(ListOfString letters)
+    {
+        var w = letters.GetStringTogether();
+        Console.WriteLine(letters.GetStringTogether());
+        if (w.Contains("sin") || w.Contains("cos") || w.Contains("min") || w.Contains("max"))
+        {
+            Console.WriteLine("OOO");
+            _tokens.Add(letters.GetStringTogether());
+            letters.ClearList();
+        }
     }
 }
